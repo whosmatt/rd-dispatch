@@ -4,15 +4,34 @@ from config import get_settings
 from rd_client import unrestrict
 from relay import stream_file
 from ui import render_form, render_result
+from functools import wraps
+import base64
 
 app = Flask(__name__)
 settings = get_settings()
 
+def check_auth():
+    auth = request.authorization
+    if not auth or not auth.username or not auth.password:
+        return False
+    cred = f"{auth.username}:{auth.password}"
+    return cred in settings["accounts"]
+
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not check_auth():
+            return Response("Unauthorized", 401, {"WWW-Authenticate": 'Basic realm="Login Required"'})
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route("/", methods=["GET"])
+@require_auth
 def index():
     return render_form()
 
 @app.route("/convert", methods=["POST"])
+@require_auth
 def convert():
     url = request.form.get("url", "").strip()
     if not url:
@@ -26,6 +45,7 @@ def convert():
     return render_result(result)
 
 @app.route("/download")
+@require_auth
 def download():
     download_url = request.args.get("download_url")
     filename = request.args.get("filename", "file")
