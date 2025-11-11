@@ -1,6 +1,5 @@
 monsterui
-fasthtml
 pyrd
 httpx[http2]
-uvicorn[standard]
 python-dotenv
+flask
