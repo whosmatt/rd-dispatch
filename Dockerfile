@@ -9,3 +9,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ LICENSE ./
 
 ENTRYPOINT ["python3", "main.py"]
+
+EXPOSE 5000
