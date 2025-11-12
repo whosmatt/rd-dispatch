@@ -2,4 +2,4 @@ monsterui
 pyrd
 httpx[http2]
 python-dotenv
-flask
+python-fasthtml

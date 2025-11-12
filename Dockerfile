@@ -10,4 +10,4 @@ COPY app/ LICENSE ./
 
 ENTRYPOINT ["python3", "main.py"]
 
-EXPOSE 5000
+EXPOSE 5001

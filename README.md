@@ -16,7 +16,7 @@ services:
     container_name: rd-dispatch
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       REALDEBRID_TOKEN: TKT...
       ACCOUNTS: |
