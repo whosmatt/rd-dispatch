@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from monsterui.all import *
 from starlette.responses import StreamingResponse
+import httpx
 from config import get_settings
 from rd_client import unrestrict
 from relay import stream_file
@@ -46,13 +47,17 @@ def download(request):
     if not download_url:
         return Response("Missing download URL.", status=400)
     try:
+        head_resp = httpx.head(download_url, timeout=10)
+        head_resp.raise_for_status()
+        file_size = head_resp.headers.get("Content-Length")
         def generate():
             for chunk in stream_file(download_url):
                 yield chunk
         headers = {
             "Content-Disposition": f'attachment; filename="{filename}"',
-            # "Accept-Ranges": "bytes",  # Uncomment for future range support
         }
+        if file_size:
+            headers["Content-Length"] = file_size
         return StreamingResponse(generate(), headers=headers, media_type="application/octet-stream")
     except Exception as e:
         return Response(f"Download failed: {e}", status_code=502)
