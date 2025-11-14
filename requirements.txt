@@ -1,5 +1,3 @@
 monsterui
-pyrd
 httpx[http2]
-python-dotenv
 python-fasthtml
