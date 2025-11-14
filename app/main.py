@@ -61,5 +61,4 @@ def download(request):
     except Exception as e:
         return Response(f"Download failed: {e}", status_code=502)
 
-if __name__ == "__main__":
-    serve()
+serve()
