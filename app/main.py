@@ -7,9 +7,10 @@ from relay import stream_file
 from ui import render_form, render_result
 from auth import require_auth
 
-settings = get_settings()
-
-app, rt = fast_app(hdrs=Theme.blue.headers())
+hdrs = Theme.green.headers() + [
+    Style("body { font-family: monospace !important; }")
+]
+app, rt = fast_app(hdrs=hdrs)
 
 @rt
 def index(request):
