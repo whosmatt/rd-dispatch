@@ -2,7 +2,6 @@ from fasthtml.common import *
 from monsterui.all import *
 from starlette.responses import StreamingResponse
 import httpx
-from config import get_settings
 from rd_client import unrestrict
 from relay import stream_file
 from ui import render_form, render_result

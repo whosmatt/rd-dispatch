@@ -13,3 +13,5 @@ def get_settings():
         if ':' in line:
             accounts.add(line)
     return {"token": token, "accounts": accounts}
+
+settings = get_settings()

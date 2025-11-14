@@ -1,5 +1,5 @@
 import httpx
-from config import get_settings
+from config import settings
 
 RD_API = "https://api.real-debrid.com/rest/1.0/unrestrict/link"
 
@@ -7,7 +7,6 @@ class RDClientError(Exception):
     pass
 
 def unrestrict(url):
-    settings = get_settings()
     token = settings["token"]
     headers = {"Authorization": f"Bearer {token}"}
     try:

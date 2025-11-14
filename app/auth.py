@@ -1,8 +1,6 @@
-from config import get_settings
+from config import settings
 from fasthtml.common import Response
 import base64
-
-settings = get_settings()
 
 def check_auth(request):
     auth = request.headers.get('Authorization', '')
