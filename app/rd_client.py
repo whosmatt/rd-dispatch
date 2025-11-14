@@ -1,0 +1,22 @@
+import httpx
+from config import settings
+
+RD_API = "https://api.real-debrid.com/rest/1.0/unrestrict/link"
+
+class RDClientError(Exception):
+    pass
+
+def unrestrict(url):
+    token = settings["token"]
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        resp = httpx.post(RD_API, data={"link": url}, headers=headers, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        if "download" not in data or "filename" not in data:
+            raise RDClientError("Invalid response from Real-Debrid.")
+        return {"filename": data["filename"], "download_url": data["download"]}
+    except httpx.HTTPStatusError as e:
+        raise ValueError(f"Real-Debrid error: {e.response.text}")
+    except Exception as e:
+        raise RDClientError(str(e))
