@@ -2,9 +2,9 @@ from fasthtml.common import *
 from monsterui.all import *
 from starlette.responses import StreamingResponse
 import httpx
-from rd_client import unrestrict
+from rd_client import unrestrict, supported_hosts
 from relay import stream_file
-from ui import render_form, render_result
+from ui import render_form, render_result, render_hosts
 from auth import require_auth
 
 hdrs = Theme.green.headers() + [
@@ -61,5 +61,12 @@ def download(request):
         return StreamingResponse(generate(), headers=headers, media_type="application/octet-stream")
     except Exception as e:
         return Response(f"Download failed: {e}", status_code=502)
+
+@rt
+def hosts(request):
+    auth_resp = require_auth(request)
+    if auth_resp:
+        return auth_resp
+    return render_hosts(supported_hosts())
 
 serve()
