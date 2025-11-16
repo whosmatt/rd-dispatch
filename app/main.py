@@ -10,7 +10,7 @@ from auth import require_auth
 hdrs = Theme.green.headers() + [
     Style("body { font-family: monospace !important; }")
 ]
-app, rt = fast_app(hdrs=hdrs)
+app, rt = fast_app(hdrs=hdrs, title="rd-dispatch")
 
 @rt
 def index(request):
