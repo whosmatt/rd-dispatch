@@ -6,6 +6,7 @@ class RDAPI:
     base = "https://api.real-debrid.com/rest/1.0/"
     unrestrict_link = f"{base}unrestrict/link"
     hosts_domains = f"{base}hosts/domains"
+    hosts_status = f"{base}hosts/status"
 
 class RDClientError(Exception):
     pass
@@ -27,8 +28,23 @@ def unrestrict(url):
 
 def supported_hosts():
     try:
-        resp = httpx.get(RDAPI.hosts_domains, timeout=10)
+        token = settings["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        resp = httpx.get(RDAPI.hosts_status, timeout=10, headers=headers)
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+        hosts = []
+        for domain, info in data.items():
+            # skip unsupported hosts
+            if info.get("supported") != 1:
+                continue
+            status = info.get("status")
+            hosts.append({
+                "domain": domain,
+                "name": info.get("name") or domain,
+                "image": info.get("image"),
+                "status": status
+            })
+        return hosts
     except Exception as e:
         raise RDClientError(str(e))
