@@ -1,6 +1,6 @@
 from monsterui.franken import *
 from monsterui.daisy import Loading, LoadingT, Toast, ToastVT, ToastHT
-from monsterui.franken import P, A, Ul, Li
+from monsterui.franken import P, A, Ul, Li, Img, Div, Span
 
 def render_form(error=None):
     form = Form(
@@ -47,10 +47,27 @@ def render_result(result):
     )
 
 def render_hosts(hosts):
-    host_list = Ul(
-        *[Li(host) for host in hosts],
-        cls=ListT.striped
-    )
+    # hosts is a list of dicts: {domain, name, image, status}
+    items = []
+    for h in hosts:
+        domain = h.get("domain")
+        name = h.get("name")
+        img = h.get("image")
+        status = h.get("status")
+        badge_cls = "bg-green-100 text-green-800" if status == "up" else "bg-red-100 text-red-800"
+        host_item = DivLAligned(
+            Img(src=img, cls=("w-4 h-4 rounded mr-3 object-cover") if img else ("w-4 h-4 rounded mr-3 bg-gray-200")),
+            Div(
+                H6(name),
+                P(domain, cls=(TextPresets.muted_sm, "text-xs"))
+            ),
+            Span(status.capitalize() if status else "Unknown", cls=("px-2 py-1 rounded-full text-sm ml-auto", badge_cls)),
+            cls=("items-center flex w-full")
+        )
+        items.append(Li(host_item))
+
+    host_list = Ul(*items, cls=ListT.striped)
+
     return Container(
         H3("Supported Hosts"),
         DividerSplit(cls="h-3 mb-2"),
