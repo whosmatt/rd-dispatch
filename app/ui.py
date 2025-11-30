@@ -2,6 +2,18 @@ from monsterui.franken import *
 from monsterui.daisy import Loading, LoadingT, Toast, ToastVT, ToastHT
 from monsterui.franken import P, A, Ul, Li, Img, Div, Span
 
+def _human_size(num):
+    # simple human-readable size
+    try:
+        num = int(num)
+    except Exception:
+        return ""
+    for unit in ["B", "KB", "MB", "GB", "TB (good luck!)"]:
+        if num < 1024:
+            return f"{num}{unit}"
+        num = num // 1024
+    return f"{num}PB (how????)"
+
 def render_form(error=None):
     form = Form(
         Input(id="url", name="url", placeholder="Enter URL", cls="w-full"),
@@ -95,7 +107,8 @@ def render_torrent(info):
         path = f.get("path")
         size = f.get("bytes")
         selected = f.get("selected")
-        checkbox = LabelCheckboxX(path, id=f"file_{fid}", name="files", value=str(fid), checked=bool(selected))
+        readable = _human_size(size)
+        checkbox = LabelCheckboxX(f"{path} ({readable})", id=f"file_{fid}", name="files", value=str(fid), checked=bool(selected))
         items.append(Li(checkbox))
 
     file_list = Ul(*items, cls=ListT.striped) if items else P("No files yet")
