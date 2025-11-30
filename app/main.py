@@ -86,10 +86,23 @@ async def select_files(request):
     files = form.getlist("files") if hasattr(form, 'getlist') else []
     try:
         result = await asyncio.to_thread(rd.select_files, torrent_id, files or [])
-    except ValueError as e:
+    except Exception as e:
         return render_form(error=str(e))
-    except Exception:
-        return render_form(error="Error contacting Real-Debrid.")
     return render_torrent(result)
+
+@rt
+async def torrent_info(request):
+    auth_resp = require_auth(request)
+    if auth_resp:
+        return auth_resp
+    query = request.query_params
+    torrent_id = query.get("torrent_id")
+    if not torrent_id:
+        return Response("Missing torrent_id", status_code=400)
+    try:
+        info = await asyncio.to_thread(rd.get_torrent_info, torrent_id)
+    except Exception as e:
+        return render_torrent([], error=str(e))
+    return render_torrent(info)
 
 serve()

@@ -117,11 +117,20 @@ class RDClient:
             resp = httpx.post(select_url, data={"files": files_param}, headers={**self.headers, "Content-Type": "application/x-www-form-urlencoded"}, timeout=10)
             resp.raise_for_status()
 
+            return self.get_torrent_info(torrent_id)
+        except httpx.HTTPStatusError as e:
+            raise ValueError(f"Real-Debrid selectFiles error: {e.response.text}")
+        except Exception as e:
+            raise RDClientError(str(e))
+
+    def get_torrent_info(self, torrent_id):
+        """Fetch torrent info for a given torrent id."""
+        try:
             info_url = f"{self.base}torrents/info/{torrent_id}"
             info_resp = httpx.get(info_url, headers=self.headers, timeout=10)
             info_resp.raise_for_status()
             return info_resp.json()
         except httpx.HTTPStatusError as e:
-            raise ValueError(f"Real-Debrid selectFiles error: {e.response.text}")
+            raise ValueError(f"Real-Debrid info error: {e.response.text}")
         except Exception as e:
             raise RDClientError(str(e))
