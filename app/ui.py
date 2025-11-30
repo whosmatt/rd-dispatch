@@ -127,6 +127,7 @@ def render_torrent(info):
         action="/select_files",
         hx_post="/select_files",
         hx_target="body",
+        onsubmit="if(document.querySelectorAll('input[name=files]:checked').length===0){ event.preventDefault(); event.stopImmediatePropagation(); alert('Please select at least one file'); return false;} return true;",
         cls="space-y-4"
     )
 
