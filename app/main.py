@@ -100,7 +100,7 @@ async def torrent_info(request):
     try:
         info = await asyncio.to_thread(rd.get_torrent_info, torrent_id)
     except Exception as e:
-        return render_torrent([], error=str(e))
+        return render_torrent({}, error=str(e))
     return render_torrent(info)
 
 serve()
