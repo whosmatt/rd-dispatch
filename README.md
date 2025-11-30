@@ -3,7 +3,8 @@
 ## Overview
 
 rd-dispatch is a proxy service that unrestricts and dispatches Real-Debrid downloads via a simple HTTP API and web UI.  
-Torrents are not currently supported.
+Torrents are supported via magnet links and expose functionality to select files from multi-file torrents.  
+While Real-Debrid does not explicitly prohibit this usage, ensure compliance with their [Terms of Service](https://real-debrid.com/terms).
 
 ## Installation
 
@@ -32,5 +33,7 @@ All endpoints require HTTP Basic Auth. Any valid `username:password` in `ACCOUNT
 - No persistent storage; all downloads are streamed.
 
 ### Notes
-- Designed for few-user, low-traffic use.
+- Designed for single-user, low-traffic use.
+- Many actions are synchronous.
+- Real-Debrid API rate limit of 250 requests/minute applies (but is unlikely to be hit).
 - UI built with MonsterUI.
