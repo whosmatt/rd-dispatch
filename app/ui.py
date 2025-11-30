@@ -136,7 +136,7 @@ def render_torrent(info, error=None):
         H3(f"Torrent: {title}"),
         DividerSplit(cls="h-3 mb-2"),
         H6(f"Status: {status}", cls=(TextPresets.muted_sm, "mb-2")),
-        P(f"Progress: {progress}") if progress is not None else None,
+        P(f"Progress: {progress}%") if progress is not None else None,
         P(f"Seeders: {seeders}") if seeders is not None else None,
         P(f"Speed: {_human_size(speed)}/s") if speed is not None else None,
         select_form,
