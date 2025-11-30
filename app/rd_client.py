@@ -86,7 +86,6 @@ class RDClient:
             torrent_uri = None
             if isinstance(data, dict):
                 torrent_uri = data.get("uri")
-                torrent_id = data.get("id")
 
             if torrent_uri:
                 info_resp = httpx.get(torrent_uri, headers=self.headers, timeout=10)
