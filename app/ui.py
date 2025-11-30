@@ -13,7 +13,8 @@ def render_form(error=None):
         ),
         cls="space-y-2",
         action="/convert",
-        hx_post="/convert",
+        method="get",
+        hx_get="/convert",
         hx_target="body"
     )
     content = [

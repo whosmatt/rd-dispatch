@@ -28,8 +28,8 @@ async def convert(request):
     auth_resp = require_auth(request)
     if auth_resp:
         return auth_resp
-    form = await request.form()
-    url = form.get("url", "").strip()
+    query = request.query_params
+    url = query.get("url", "").strip()
     if not url:
         return render_form(error="Please enter a URL.")
     try:
