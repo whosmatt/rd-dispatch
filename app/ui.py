@@ -11,9 +11,9 @@ def _human_size(num):
         return ""
     for unit in ["B", "KB", "MB", "GB", "TB (good luck!)"]:
         if num < 1024:
-            return f"{num}{unit}"
+            return f"{num} {unit}"
         num = num // 1024
-    return f"{num}PB (how????)"
+    return f"{num} PB (how????)"
 
 def _error_toast(message):
     return Toast(
@@ -110,8 +110,10 @@ def render_torrent(info, error=None):
         size = f.get("bytes")
         selected = f.get("selected")
         readable = _human_size(size)
-        checkbox = LabelCheckboxX(f"{path} ({readable})", id=f"file_{fid}", name="files", value=str(fid), checked=bool(selected))
-        items.append(Li(checkbox))
+        checkbox = LabelCheckboxX(f"{path}", id=f"file_{fid}", name="files", value=str(fid), checked=bool(selected))
+        size_span = Span(readable, cls=(TextPresets.muted_sm, "text-xs ml-auto"))
+        row = Div(checkbox, size_span, cls=("flex items-center w-full"))
+        items.append(Li(row, cls=("w-full")))
 
     file_list = Ul(*items, cls=ListT.striped) if items else P("No files yet")
 
