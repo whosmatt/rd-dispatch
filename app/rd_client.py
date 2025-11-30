@@ -114,7 +114,7 @@ class RDClient:
                 files_param = ",".join(str(int(f)) for f in cleaned)
 
             select_url = f"{self.torrents_select_files}{torrent_id}"
-            resp = httpx.post(select_url, data={"files": files_param}, headers={**self.headers, "Content-Type": "application/x-www-form-urlencoded"}, timeout=10)
+            resp = httpx.post(select_url, data={"files": files_param}, headers=self.headers, timeout=10)
             resp.raise_for_status()
 
             return self.get_torrent_info(torrent_id)
