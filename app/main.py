@@ -2,15 +2,19 @@ from fasthtml.common import *
 from monsterui.all import *
 from starlette.responses import StreamingResponse
 import httpx
-from rd_client import unrestrict, supported_hosts
+import asyncio
+from rd_client import RDClient
 from relay import stream_file
-from ui import render_form, render_result, render_hosts
+from ui import render_form, render_result, render_hosts, render_torrent
 from auth import require_auth
 
 hdrs = Theme.green.headers() + [
     Style("body { font-family: monospace !important; }")
 ]
 app, rt = fast_app(hdrs=hdrs, title="rd-dispatch")
+
+# RD client instance
+rd = RDClient()
 
 @rt
 def index(request):
@@ -24,16 +28,17 @@ async def convert(request):
     auth_resp = require_auth(request)
     if auth_resp:
         return auth_resp
-    form = await request.form()
-    url = form.get("url", "").strip()
+    query = request.query_params
+    url = query.get("url", "").strip()
     if not url:
         return render_form(error="Please enter a URL.")
     try:
-        result = unrestrict(url)
-    except ValueError as e:
-        return render_form(error=str(e))
+        if url.startswith("magnet:"):
+            result = await asyncio.to_thread(rd.add_torrent, url)
+            return render_torrent(result)
+        result = await asyncio.to_thread(rd.unrestrict, url)
     except Exception as e:
-        return render_form(error="Error contacting Real-Debrid.")
+        return render_form(error=str(e))
     return render_result(result)
 
 @rt
@@ -67,6 +72,35 @@ def hosts(request):
     auth_resp = require_auth(request)
     if auth_resp:
         return auth_resp
-    return render_hosts(supported_hosts())
+    return render_hosts(rd.supported_hosts())
+
+@rt
+async def select_files(request):
+    auth_resp = require_auth(request)
+    if auth_resp:
+        return auth_resp
+    form = await request.form()
+    torrent_id = form.get("torrent_id")
+    files = form.getlist("files") if hasattr(form, 'getlist') else []
+    try:
+        result = await asyncio.to_thread(rd.select_files, torrent_id, files or [])
+    except Exception as e:
+        return render_form(error=str(e))
+    return render_torrent(result)
+
+@rt
+async def torrent_info(request):
+    auth_resp = require_auth(request)
+    if auth_resp:
+        return auth_resp
+    query = request.query_params
+    torrent_id = query.get("torrent_id")
+    if not torrent_id:
+        return Response("Missing torrent_id", status_code=400)
+    try:
+        info = await asyncio.to_thread(rd.get_torrent_info, torrent_id)
+    except Exception as e:
+        return render_torrent({}, error=str(e))
+    return render_torrent(info)
 
 serve()
