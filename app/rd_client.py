@@ -80,7 +80,7 @@ class RDClient:
         ValueError with the raw response.
         """
         try:
-            resp = httpx.post(self.torrents_add_magnet, data={"magnet": url}, headers={**self.headers, "Content-Type": "application/x-www-form-urlencoded"}, timeout=10)
+            resp = httpx.post(self.torrents_add_magnet, data={"magnet": url}, headers=self.headers, timeout=10)
             resp.raise_for_status()
             data = resp.json()
             torrent_uri = None
