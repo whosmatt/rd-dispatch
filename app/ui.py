@@ -1,4 +1,5 @@
 from monsterui.franken import *
+from urllib.parse import quote_plus
 from monsterui.daisy import Loading, LoadingT, Toast, ToastVT, ToastHT
 from monsterui.franken import P, A, Ul, Li, Img, Div, Span
 
@@ -100,6 +101,7 @@ def render_torrent(info):
     status = info.get("status")
     progress = info.get("progress")
     files = info.get("files") or []
+    links = info.get("links")
 
     items = []
     for f in files:
@@ -119,7 +121,7 @@ def render_torrent(info):
         Div(
             Button("Select All", type="button", cls=(ButtonT.secondary, "mr-2"), hx_on_click="document.querySelectorAll('input[name=files]').forEach(i=>i.checked=true)"),
             Button("Select None", type="button", cls=(ButtonT.default, "mr-2"), hx_on_click="document.querySelectorAll('input[name=files]').forEach(i=>i.checked=false)"),
-            Button(Loading(cls=(LoadingT.spinner, LoadingT.sm), htmx_indicator=True), "Apply Selection", type="submit", cls=(ButtonT.primary, "ml-auto")),
+            Button(Loading(cls=(LoadingT.spinner, LoadingT.sm), htmx_indicator=True),"Generate Links", type="submit", cls=(ButtonT.primary, "ml-auto")),
             cls=("flex items-center")
         ),
         action="/select_files",
@@ -134,8 +136,20 @@ def render_torrent(info):
         H6(f"Status: {status}", cls=(TextPresets.muted_sm, "mb-2")),
         P(f"Progress: {progress}") if progress is not None else None,
         select_form,
-        Button("Go back", cls=(ButtonT.default, "w-full", "mt-4"), hx_on_click="window.location='/'")
+        DividerSplit(cls="h-3 mb-2"),
     ]
+
+    # If Real-Debrid returned host links, show forms to unrestrict each link
+    if links:
+        link_items = []
+        for l in links:
+            encoded = quote_plus(l)
+            link_href = f"/convert?url={encoded}"
+            link_items.append(Li(A(l, href=link_href, target="_blank", rel="noopener", cls=AT.primary)))
+        links_list = Ul(*link_items, cls=ListT.striped)
+        content.extend([H5("Download Links"), links_list])
+
+    content.append(Button("Go back", cls=(ButtonT.default, "w-full", "mt-4"), hx_on_click="window.location='/'"))
 
     content = [c for c in content if c]
     return Container(*content, cls="max-w-xl mx-auto mt-8")
