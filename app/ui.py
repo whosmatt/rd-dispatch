@@ -76,3 +76,52 @@ def render_hosts(hosts):
         host_list,
         cls="max-w-xl mx-auto mt-8"
     )
+
+
+def render_torrent(info):
+    # normalize list -> dict
+    if isinstance(info, list) and info:
+        info = info[0]
+
+    title = info.get("original_filename") or info.get("filename") or info.get("id")
+    status = info.get("status")
+    progress = info.get("progress")
+    files = info.get("files") or []
+
+    items = []
+    for f in files:
+        fid = f.get("id")
+        path = f.get("path")
+        size = f.get("bytes")
+        selected = f.get("selected")
+        checkbox = LabelCheckboxX(path, id=f"file_{fid}", name="files", value=str(fid), checked=bool(selected))
+        items.append(Li(checkbox))
+
+    file_list = Ul(*items, cls=ListT.striped) if items else P("No files yet")
+
+    select_form = Form(
+        Input(type="hidden", name="torrent_id", value=info.get("id")),
+        file_list,
+        Div(
+            Button("Select All", type="button", cls=(ButtonT.secondary, "mr-2"), hx_on_click="document.querySelectorAll('input[name=files]').forEach(i=>i.checked=true)"),
+            Button("Select None", type="button", cls=(ButtonT.default, "mr-2"), hx_on_click="document.querySelectorAll('input[name=files]').forEach(i=>i.checked=false)"),
+            Button(Loading(cls=(LoadingT.spinner, LoadingT.sm), htmx_indicator=True), "Apply Selection", type="submit", cls=(ButtonT.primary, "ml-auto")),
+            cls=("flex items-center")
+        ),
+        action="/select_files",
+        hx_post="/select_files",
+        hx_target="body",
+        cls="space-y-4"
+    )
+
+    content = [
+        H3(f"Torrent: {title}"),
+        DividerSplit(cls="h-3 mb-2"),
+        H6(f"Status: {status}", cls=(TextPresets.muted_sm, "mb-2")),
+        P(f"Progress: {progress}") if progress is not None else None,
+        select_form,
+        Button("Go back", cls=(ButtonT.default, "w-full", "mt-4"), hx_on_click="window.location='/'")
+    ]
+
+    content = [c for c in content if c]
+    return Container(*content, cls="max-w-xl mx-auto mt-8")
