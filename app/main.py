@@ -37,10 +37,8 @@ async def convert(request):
             result = await asyncio.to_thread(rd.add_torrent, url)
             return render_torrent(result)
         result = await asyncio.to_thread(rd.unrestrict, url)
-    except ValueError as e:
-        return render_form(error=str(e))
     except Exception as e:
-        return render_form(error="Error contacting Real-Debrid.")
+        return render_form(error=str(e))
     return render_result(result)
 
 @rt
