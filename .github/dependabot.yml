@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Docker base image updates
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Python dependencies updates
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
