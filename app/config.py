@@ -1,4 +1,5 @@
 import os
+import secrets
 
 def get_settings():
     token = os.getenv("REALDEBRID_TOKEN")
@@ -12,6 +13,7 @@ def get_settings():
             continue
         if ':' in line:
             accounts.add(line)
-    return {"token": token, "accounts": accounts}
+    guest_secret = os.getenv("GUEST_SECRET") or secrets.token_hex(32)
+    return {"token": token, "accounts": accounts, "guest_secret": guest_secret}
 
 settings = get_settings()
