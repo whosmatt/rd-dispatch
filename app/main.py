@@ -1,6 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
-from starlette.responses import StreamingResponse
+from starlette.responses import StreamingResponse, RedirectResponse
 import httpx
 import asyncio
 from rd_client import RDClient
@@ -40,7 +40,10 @@ async def convert(request):
     except Exception as e:
         return render_form(error=str(e))
     token = generate_guest_token(result["download_url"], result["filename"])
-    return Response("", headers={"HX-Redirect": f"/download?t={token}"})
+    dest = f"/download?t={token}"
+    if request.headers.get("HX-Request"):
+        return Response("", headers={"HX-Redirect": dest})
+    return RedirectResponse(dest, status_code=303)
 
 @rt
 def download(request):
