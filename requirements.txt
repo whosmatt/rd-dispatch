@@ -1,3 +1,4 @@
 monsterui
 httpx[http2]
 python-fasthtml
+cryptography

@@ -1,5 +1,5 @@
 import os
-import secrets
+from cryptography.fernet import Fernet
 
 def get_settings():
     token = os.getenv("REALDEBRID_TOKEN")
@@ -13,7 +13,7 @@ def get_settings():
             continue
         if ':' in line:
             accounts.add(line)
-    guest_secret = os.getenv("GUEST_SECRET") or secrets.token_hex(32)
+    guest_secret = os.getenv("GUEST_SECRET") or Fernet.generate_key().decode()
     return {"token": token, "accounts": accounts, "guest_secret": guest_secret}
 
 settings = get_settings()
