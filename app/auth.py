@@ -48,4 +48,4 @@ def verify_guest_token(token: str):
     payload = json.loads(base64.urlsafe_b64decode(payload_b64 + '=' * (padding % 4)))
     if time.time() > payload['exp']:
         raise ValueError("Link expired")
-    return payload['u'], payload['f']
+    return payload['u'], payload['f'], payload['exp']

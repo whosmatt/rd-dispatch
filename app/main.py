@@ -46,16 +46,16 @@ async def convert(request):
 def download(request):
     token = request.query_params.get("t", "")
     try:
-        download_url, filename = verify_guest_token(token)
+        _, filename, exp = verify_guest_token(token)
     except ValueError as e:
         return render_download_page(None, None, error=str(e))
-    return render_download_page(filename, token)
+    return render_download_page(filename, token, exp=exp)
 
 @rt
 def stream(request):
     token = request.query_params.get("t", "")
     try:
-        download_url, filename = verify_guest_token(token)
+        download_url, filename, _ = verify_guest_token(token)
     except ValueError as e:
         return Response(str(e), status_code=403)
     try:
