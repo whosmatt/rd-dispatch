@@ -1,12 +1,12 @@
 from fasthtml.common import *
 from monsterui.all import *
-from starlette.responses import StreamingResponse
+from starlette.responses import StreamingResponse, RedirectResponse
 import httpx
 import asyncio
 from rd_client import RDClient
 from relay import stream_file
-from ui import render_form, render_result, render_hosts, render_torrent
-from auth import require_auth
+from ui import render_form, render_download_page, render_hosts, render_torrent
+from auth import require_auth, generate_guest_token, verify_guest_token
 
 hdrs = Theme.green.headers() + [
     Style("body { font-family: monospace !important; }")
@@ -39,18 +39,28 @@ async def convert(request):
         result = await asyncio.to_thread(rd.unrestrict, url)
     except Exception as e:
         return render_form(error=str(e))
-    return render_result(result)
+    token = generate_guest_token(result["download_url"], result["filename"])
+    dest = f"/download?t={token}"
+    if request.headers.get("HX-Request"):
+        return Response("", headers={"HX-Redirect": dest})
+    return RedirectResponse(dest, status_code=303)
 
 @rt
 def download(request):
-    auth_resp = require_auth(request)
-    if auth_resp:
-        return auth_resp
-    query = request.query_params
-    download_url = query.get("download_url")
-    filename = query.get("filename", "file")
-    if not download_url:
-        return Response("Missing download URL.", status=400)
+    token = request.query_params.get("t", "")
+    try:
+        _, filename, exp = verify_guest_token(token)
+    except ValueError as e:
+        return render_download_page(None, None, error=str(e))
+    return render_download_page(filename, token, exp=exp)
+
+@rt
+def stream(request):
+    token = request.query_params.get("t", "")
+    try:
+        download_url, filename, _ = verify_guest_token(token)
+    except ValueError as e:
+        return Response(str(e), status_code=403)
     try:
         head_resp = httpx.head(download_url, timeout=10)
         head_resp.raise_for_status()

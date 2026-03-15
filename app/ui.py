@@ -1,7 +1,8 @@
 from monsterui.franken import *
 from urllib.parse import quote_plus
 from monsterui.daisy import Loading, LoadingT, Toast, ToastVT, ToastHT
-from monsterui.franken import P, A, Ul, Li, Img, Div, Span
+from monsterui.franken import P, A, Ul, Li, Img, Div, Span, Title, Meta
+from datetime import datetime, timezone
 
 def _human_size(num):
     # simple human-readable size
@@ -48,18 +49,41 @@ def render_form(error=None):
     container = Container(*content, cls="max-w-xl mx-auto mt-8")
     return container
 
-def render_result(result):
-    filename = result["filename"]
-    download_url = result["download_url"]
-    link = f"/download?download_url={download_url}&filename={filename}"
-    return Container(
+def render_download_page(filename, token, exp=None, error=None):
+    if error:
+        og = (
+            Title("Link Invalid · rd-dispatch"),
+            Meta(property="og:title", content="Link Invalid"),
+            Meta(property="og:description", content=error),
+            Meta(property="og:site_name", content="rd-dispatch"),
+        )
+        return og + (Container(
+            H3("Link Invalid"),
+            DividerSplit(cls="h-3 mb-2"),
+            P(error, cls="mb-3"),
+            cls="max-w-xl mx-auto mt-8"
+        ),)
+    stream_url = f"/stream?t={token}"
+    fixed = datetime.fromtimestamp(exp, tz=timezone.utc).strftime("%b %d, %Y at %H:%M UTC")
+    og = (
+        Title(f"{filename} · rd-dispatch"),
+        Meta(property="og:title", content=filename),
+        Meta(property="og:description", content=f"rd-dispatch download · Expires {fixed}"),
+        Meta(property="og:site_name", content="rd-dispatch"),
+    )
+    return og + (Container(
         H3("Download Ready"),
         DividerSplit(cls="h-3 mb-2"),
-        P(f"{filename}", cls="mb-3"),
-        Button("Download", cls=(ButtonT.primary, "w-full"), hx_on_click=f"window.location='{link}'"),
-        Button("Go back", cls=(ButtonT.default, "w-full", "mt-2"), hx_on_click="window.location='/'"),
+        P(filename, cls="mb-3"),
+        P(f"Expires {fixed}", cls=(TextPresets.muted_sm, "mb-3")),
+        A(Button("Download", cls=(ButtonT.primary, "w-full")), href=stream_url),
+        Button(
+            "Copy Link",
+            cls=(ButtonT.secondary, "w-full", "mt-2"),
+                onclick="navigator.clipboard.writeText(window.location.href).then(()=>{var b=this,o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,2000)})"
+        ),
         cls="max-w-xl mx-auto mt-8"
-    )
+    ),)
 
 def render_hosts(hosts):
     # hosts is a list of dicts: {domain, name, image, status}

@@ -23,10 +23,16 @@ services:
       ACCOUNTS: |
         user1:test
         user2:pass
-
 ```
-### Authentication
-All endpoints require HTTP Basic Auth. Any valid `username:password` in `ACCOUNTS` is accepted.
+
+### Authentication & Guest links
+All endpoints up to the 'Download Ready' page require HTTP Basic Auth. Any valid `username:password` in `ACCOUNTS` is accepted.  
+Once you reach a 'Download Ready' page, the URL itself is an encrypted guest link that can be accessed without authentication, valid for 24 hours. It can only be used to download the specific file chosen by the authenticated user.
+
+#### Setting a static key
+Guest links invalidate upon service restart due to the encryption key being rotated.  
+If you don't want this, set the environment variable `GUEST_SECRET` to a valid Fernet key:  
+`python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
 
 ### Deployment
 - For public access, use a reverse proxy (e.g., Caddy, Nginx) for SSL and IPv6.
