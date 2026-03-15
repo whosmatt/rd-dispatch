@@ -48,16 +48,25 @@ def render_form(error=None):
     container = Container(*content, cls="max-w-xl mx-auto mt-8")
     return container
 
-def render_result(result):
-    filename = result["filename"]
-    download_url = result["download_url"]
-    link = f"/download?download_url={download_url}&filename={filename}"
+def render_download_page(filename, token, error=None):
+    if error:
+        return Container(
+            H3("Link Invalid"),
+            DividerSplit(cls="h-3 mb-2"),
+            P(error, cls="mb-3"),
+            cls="max-w-xl mx-auto mt-8"
+        )
+    stream_url = f"/stream?t={token}"
     return Container(
         H3("Download Ready"),
         DividerSplit(cls="h-3 mb-2"),
-        P(f"{filename}", cls="mb-3"),
-        Button("Download", cls=(ButtonT.primary, "w-full"), hx_on_click=f"window.location='{link}'"),
-        Button("Go back", cls=(ButtonT.default, "w-full", "mt-2"), hx_on_click="window.location='/'"),
+        P(filename, cls="mb-3"),
+        A(Button("Download", cls=(ButtonT.primary, "w-full")), href=stream_url),
+        Button(
+            "Copy Link",
+            cls=(ButtonT.secondary, "w-full", "mt-2"),
+            onclick="navigator.clipboard.writeText(window.location.href)"
+        ),
         cls="max-w-xl mx-auto mt-8"
     )
 
