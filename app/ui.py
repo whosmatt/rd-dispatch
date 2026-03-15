@@ -80,7 +80,7 @@ def render_download_page(filename, token, exp=None, error=None):
         Button(
             "Copy Link",
             cls=(ButtonT.secondary, "w-full", "mt-2"),
-            onclick="navigator.clipboard.writeText(window.location.href)"
+                onclick="navigator.clipboard.writeText(window.location.href).then(()=>{var b=this,o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,2000)})"
         ),
         cls="max-w-xl mx-auto mt-8"
     ),)
