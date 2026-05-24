@@ -14,6 +14,7 @@ def get_settings():
         if ':' in line:
             accounts.add(line)
     guest_secret = os.getenv("GUEST_SECRET") or Fernet.generate_key().decode()
-    return {"token": token, "accounts": accounts, "guest_secret": guest_secret}
+    discord_token = os.getenv("DISCORD_TOKEN")
+    return {"token": token, "accounts": accounts, "guest_secret": guest_secret, "discord_token": discord_token}
 
 settings = get_settings()
