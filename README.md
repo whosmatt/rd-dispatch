@@ -20,7 +20,8 @@ services:
       - "5001:5001"
     environment:
       REALDEBRID_TOKEN: TKT...
-      DISCORD_TOKEN: ...
+      DISCORD_TOKEN: ... (optional)
+      PUBLIC_BASE_URL: https://rd.example.com (only required for Discord)
       ACCOUNTS: |
         user1:test
         user2:pass

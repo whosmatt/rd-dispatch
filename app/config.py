@@ -15,6 +15,13 @@ def get_settings():
             accounts.add(line)
     guest_secret = os.getenv("GUEST_SECRET") or Fernet.generate_key().decode()
     discord_token = os.getenv("DISCORD_TOKEN")
-    return {"token": token, "accounts": accounts, "guest_secret": guest_secret, "discord_token": discord_token}
+    public_base_url = os.getenv("PUBLIC_BASE_URL", "").rstrip("/")
+    return {
+        "token": token,
+        "accounts": accounts,
+        "guest_secret": guest_secret,
+        "discord_token": discord_token,
+        "public_base_url": public_base_url,
+    }
 
 settings = get_settings()
