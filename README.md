@@ -20,6 +20,8 @@ services:
       - "5001:5001"
     environment:
       REALDEBRID_TOKEN: TKT...
+      DISCORD_TOKEN: ... (optional)
+      PUBLIC_BASE_URL: https://rd.example.com (only required for Discord)
       ACCOUNTS: |
         user1:test
         user2:pass
@@ -28,6 +30,10 @@ services:
 ### Authentication & Guest links
 All endpoints up to the 'Download Ready' page require HTTP Basic Auth. Any valid `username:password` in `ACCOUNTS` is accepted.  
 Once you reach a 'Download Ready' page, the URL itself is an encrypted guest link that can be accessed without authentication, valid for 24 hours. It can only be used to download the specific file chosen by the authenticated user.
+
+### Discord Bot
+By providing a `DISCORD_TOKEN`, you enable an optional Discord bot that exposes guest link generation via `/unrestrict` as well as `/hosters` to list supported hosters. The commands are only visible to admins by default, so don't forget to set the intended roles in Discord via server settings -> integrations. Torrents are not supported.
+The bot needs permissions for slash commands and optionally, embed links. 
 
 #### Setting a static key
 Guest links invalidate upon service restart due to the encryption key being rotated.  
