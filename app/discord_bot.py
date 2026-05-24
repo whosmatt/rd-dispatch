@@ -12,6 +12,7 @@ def create_bot(rd: RDClient) -> discord.Client:
     tree = app_commands.CommandTree(bot)
 
     @tree.command(name="unrestrict", description="Unrestrict a download link")
+    @app_commands.default_permissions(manage_guild=True)
     @app_commands.describe(link="The link to unrestrict")
     async def unrestrict(interaction: discord.Interaction, link: str):
         await interaction.response.defer()
@@ -24,6 +25,7 @@ def create_bot(rd: RDClient) -> discord.Client:
             await interaction.followup.send(str(e))
 
     @tree.command(name="hosters", description="List supported hosters")
+    @app_commands.default_permissions(manage_guild=True)
     async def hosters(interaction: discord.Interaction):
         await interaction.response.defer()
         try:
