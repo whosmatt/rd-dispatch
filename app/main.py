@@ -12,10 +12,24 @@ from auth import require_auth, generate_guest_token, verify_guest_token
 hdrs = Theme.green.headers() + [
     Style("body { font-family: monospace !important; }")
 ]
-app, rt = fast_app(hdrs=hdrs, title="rd-dispatch")
-
-# RD client instance
 rd = RDClient()
+
+startup_hooks = []
+if settings.get("discord_token"):
+    from discord_bot import create_bot
+
+    _discord_bot = create_bot(rd)
+
+    async def _start_discord():
+        asyncio.create_task(_discord_bot.start(settings["discord_token"]))
+
+    startup_hooks.append(_start_discord)
+
+app, rt = fast_app(
+    hdrs=hdrs,
+    title="rd-dispatch",
+    on_startup=tuple(startup_hooks) if startup_hooks else None,
+)
 
 @rt
 def index(request):
@@ -113,12 +127,5 @@ async def torrent_info(request):
     except Exception as e:
         return render_torrent({}, error=str(e))
     return render_torrent(info)
-
-if settings.get("discord_token"):
-    from discord_bot import create_bot
-    _discord_bot = create_bot(rd)
-    async def _start_discord():
-        asyncio.create_task(_discord_bot.start(settings["discord_token"]))
-    app.add_event_handler("startup", _start_discord)
 
 serve()
