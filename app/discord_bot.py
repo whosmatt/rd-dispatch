@@ -11,7 +11,7 @@ def create_bot(rd: RDClient) -> discord.Client:
     bot = discord.Client(intents=intents)
     tree = app_commands.CommandTree(bot)
 
-    @tree.command(name="unrestrict", description="Unrestrict a download link via Real-Debrid")
+    @tree.command(name="unrestrict", description="Unrestrict a download link")
     @app_commands.describe(link="The link to unrestrict")
     async def unrestrict(interaction: discord.Interaction, link: str):
         await interaction.response.defer()
@@ -23,7 +23,7 @@ def create_bot(rd: RDClient) -> discord.Client:
         except Exception as e:
             await interaction.followup.send(str(e))
 
-    @tree.command(name="hosters", description="List hosts supported by Real-Debrid")
+    @tree.command(name="hosters", description="List supported hosters")
     async def hosters(interaction: discord.Interaction):
         await interaction.response.defer()
         try:
