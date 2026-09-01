@@ -1,6 +1,4 @@
-FROM python:3.15.0b2-alpine3.22
-
-RUN apk add --no-cache gcc musl-dev linux-headers
+FROM python:3.14.5-alpine3.22
 
 WORKDIR /app
 
